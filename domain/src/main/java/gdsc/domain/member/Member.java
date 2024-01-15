@@ -27,8 +27,9 @@ public class Member extends BaseEntity {
     @Column(name = "image")
     private String image;
 
+    @Embedded
     @Column(name = "password", nullable = false)
-    private String password;
+    private Password password;
 
     public Member(
             String username,
@@ -41,6 +42,10 @@ public class Member extends BaseEntity {
         this.email = new Email(email);
         this.bio = bio;
         this.image = image;
-        this.password = password;
+        this.password = new Password(password);
+    }
+
+    public boolean isPasswordMatch(String password) {
+        return this.password.isMatch(password);
     }
 }

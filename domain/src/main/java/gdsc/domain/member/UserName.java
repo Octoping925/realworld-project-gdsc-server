@@ -21,4 +21,8 @@ public class UserName {
             throw new IllegalArgumentException("username은 null이거나 빈 문자열일 수 없습니다.");
         }
     }
+
+    public String value() {
+        return value;
+    }
 }

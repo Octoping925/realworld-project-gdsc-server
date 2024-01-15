@@ -43,8 +43,8 @@ public class Article extends BaseEntity {
         this.isDeleted = false;
     }
 
-    public void delete(long requestUserId) {
-        if (this.authorId != requestUserId) {
+    public void delete(long requestMemberId) {
+        if (this.authorId != requestMemberId) {
             throw new IllegalStateException("작성자만 삭제할 수 있습니다.");
         }
 
