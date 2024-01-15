@@ -1,6 +1,6 @@
 rootProject.name = "realworld-project-gdsc-server"
 
 include(
-    "realworld-project-gdsc-server-api",
+    "realworld-api",
     "domain",
 )
