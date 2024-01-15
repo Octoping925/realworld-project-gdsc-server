@@ -1,10 +1,10 @@
 package gdsc.realworldprojectgdscserver.member;
 
 import gdsc.domain.member.MemberAuthUseCase;
-import gdsc.realworldprojectgdscserver.schema.LoginUser;
-import gdsc.realworldprojectgdscserver.schema.NewUser;
-import gdsc.realworldprojectgdscserver.schema.UpdateUser;
-import gdsc.realworldprojectgdscserver.schema.User;
+import gdsc.realworldprojectgdscserver.member.schema.LoginUser;
+import gdsc.realworldprojectgdscserver.member.schema.NewUser;
+import gdsc.realworldprojectgdscserver.member.schema.UpdateUser;
+import gdsc.realworldprojectgdscserver.member.schema.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

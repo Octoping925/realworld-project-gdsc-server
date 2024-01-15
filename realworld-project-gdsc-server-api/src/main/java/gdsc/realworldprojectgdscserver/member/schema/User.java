@@ -1,4 +1,4 @@
-package gdsc.realworldprojectgdscserver.schema;
+package gdsc.realworldprojectgdscserver.member.schema;
 
 public record User(
         String email,
