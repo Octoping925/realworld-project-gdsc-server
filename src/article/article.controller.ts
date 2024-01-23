@@ -39,14 +39,14 @@ export class ArticleController {
     this.articleService.create(createArticleDto);
 
     return {
-      articles: DUMMY_ARTICLE,
+      article: DUMMY_ARTICLE,
     };
   }
 
   @Get(':slug')
   public findArticle(@Param('slug') slug: string): ArticleDto {
     return {
-      articles: DUMMY_ARTICLE,
+      article: DUMMY_ARTICLE,
     };
   }
 
@@ -58,7 +58,7 @@ export class ArticleController {
     this.articleService.update(+slug, updateArticleDto);
 
     return {
-      articles: DUMMY_ARTICLE,
+      article: DUMMY_ARTICLE,
     };
   }
 
