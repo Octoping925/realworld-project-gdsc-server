@@ -24,7 +24,10 @@ export class CommentController {
 
   @ApiOperation({ summary: '게시물 댓글 생성' })
   @Post()
-  public createComment(@Body() createCommentDto: CreateCommentDto): CommentDto {
+  public createComment(
+    @Param('slug') slug: string,
+    @Body() createCommentDto: CreateCommentDto,
+  ): CommentDto {
     this.commentService.create(createCommentDto);
 
     return {
@@ -34,7 +37,10 @@ export class CommentController {
 
   @ApiOperation({ summary: '게시물 댓글 삭제' })
   @Delete(':id')
-  public removeComment(@Param('id') id: string): void {
+  public removeComment(
+    @Param('slug') slug: string,
+    @Param('id') id: string,
+  ): void {
     this.commentService.remove(+id);
   }
 }
