@@ -63,7 +63,7 @@ export class ArticleController {
   }
 
   @Delete(':slug')
-  public removeArticle(@Param('slug') slug: string) {
+  public removeArticle(@Param('slug') slug: string): void {
     this.articleService.remove(+slug);
   }
 }
