@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ArticleModule } from './article/article.module';
-import { CommentModule } from './comment/comment.module';
-import { FavoriteModule } from './favorite/favorite.module';
-import { UserModule } from './user/user.module';
-import { TagModule } from './tag/tag.module';
-import { FollowModule } from './follow/follow.module';
+import { ArticleModule } from './domain/article/article.module';
+import { CommentModule } from './domain/comment/comment.module';
+import { FavoriteModule } from './domain/favorite/favorite.module';
+import { UserModule } from './domain/user/user.module';
+import { TagModule } from './domain/tag/tag.module';
+import { FollowModule } from './domain/follow/follow.module';
 
 @Module({
   imports: [
