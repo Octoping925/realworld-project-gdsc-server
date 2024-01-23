@@ -4,11 +4,14 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentListDto } from './dto/comment-list.dto';
 import { CommentDto } from './dto/comment.dto';
 import { DUMMY_COMMENT } from './schema/comment.dummy.schema';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Comments')
 @Controller('article/:slug/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
+  @ApiOperation({ summary: '게시물 댓글 불러오기' })
   @Get()
   public findCommentsOfArticle(@Param('slug') slug: string): CommentListDto {
     this.commentService.findAll();
@@ -19,6 +22,7 @@ export class CommentController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 댓글 생성' })
   @Post()
   public createComment(@Body() createCommentDto: CreateCommentDto): CommentDto {
     this.commentService.create(createCommentDto);
@@ -28,6 +32,7 @@ export class CommentController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 댓글 삭제' })
   @Delete(':id')
   public removeComment(@Param('id') id: string): void {
     this.commentService.remove(+id);

@@ -1,6 +1,6 @@
 import { Profile } from '../../user/schema/profile.schema';
 
-export type Article = {
+export class Article {
   slug: string;
   title: string;
   description: string;
@@ -11,4 +11,4 @@ export type Article = {
   favorited: boolean;
   favoritesCount: number;
   author: Profile;
-};
+}

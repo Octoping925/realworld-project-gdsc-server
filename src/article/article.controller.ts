@@ -13,11 +13,14 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleListDto } from './dto/article-list.dto';
 import { ArticleDto } from './dto/article.dto';
 import { DUMMY_ARTICLE } from './schema/article.dummy';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('article')
+@ApiTags('Articles')
+@Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @ApiOperation({ summary: '피드 게시물 불러오기' })
   @Get('/feed')
   public getFeed(): ArticleListDto {
     return {
@@ -26,6 +29,7 @@ export class ArticleController {
     };
   }
 
+  @ApiOperation({ summary: '최근 게시물 불러오기' })
   @Get()
   public getRecentArticles(): ArticleListDto {
     return {
@@ -34,6 +38,7 @@ export class ArticleController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 생성' })
   @Post()
   public createArticle(@Body() createArticleDto: CreateArticleDto): ArticleDto {
     this.articleService.create(createArticleDto);
@@ -43,6 +48,7 @@ export class ArticleController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 조회' })
   @Get(':slug')
   public findArticle(@Param('slug') slug: string): ArticleDto {
     return {
@@ -50,6 +56,7 @@ export class ArticleController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 수정' })
   @Put(':slug')
   public updateArticle(
     @Param('slug') slug: string,
@@ -62,6 +69,7 @@ export class ArticleController {
     };
   }
 
+  @ApiOperation({ summary: '게시물 삭제' })
   @Delete(':slug')
   public removeArticle(@Param('slug') slug: string): void {
     this.articleService.remove(+slug);

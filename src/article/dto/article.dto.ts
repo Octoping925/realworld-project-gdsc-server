@@ -1,5 +1,5 @@
 import { Article } from '../schema/article.schema';
 
-export type ArticleDto = {
+export class ArticleDto {
   article: Article;
-};
+}

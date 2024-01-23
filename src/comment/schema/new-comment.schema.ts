@@ -1,3 +1,3 @@
-export type NewComment = {
+export class NewComment {
   body: string;
-};
+}
