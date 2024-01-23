@@ -1,34 +1,69 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleListDto } from './dto/article-list.dto';
+import { ArticleDto } from './dto/article.dto';
+import { DUMMY_ARTICLE } from './schema/article.dummy';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  @Post()
-  create(@Body() createArticleDto: CreateArticleDto) {
-    return this.articleService.create(createArticleDto);
+  @Get('/feed')
+  public getFeed(): ArticleListDto {
+    return {
+      articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
+      articlesCount: 2,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.articleService.findAll();
+  public getRecentArticles(): ArticleListDto {
+    return {
+      articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
+      articlesCount: 2,
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.articleService.findOne(+id);
+  @Post()
+  public createArticle(@Body() createArticleDto: CreateArticleDto): ArticleDto {
+    this.articleService.create(createArticleDto);
+
+    return {
+      articles: DUMMY_ARTICLE,
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-    return this.articleService.update(+id, updateArticleDto);
+  @Get(':slug')
+  public findArticle(@Param('slug') slug: string): ArticleDto {
+    return {
+      articles: DUMMY_ARTICLE,
+    };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.articleService.remove(+id);
+  @Put(':slug')
+  public updateArticle(
+    @Param('slug') slug: string,
+    @Body() updateArticleDto: UpdateArticleDto,
+  ): ArticleDto {
+    this.articleService.update(+slug, updateArticleDto);
+
+    return {
+      articles: DUMMY_ARTICLE,
+    };
+  }
+
+  @Delete(':slug')
+  public removeArticle(@Param('slug') slug: string) {
+    this.articleService.remove(+slug);
   }
 }
