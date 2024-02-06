@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schema';
+import { DUMMY_USER } from './schema/user.dummy.schema';
 
 @Injectable()
 export class UserService {
@@ -22,5 +24,9 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  public findByEmailAndPassword(email: string, password: string): User {
+    return DUMMY_USER;
   }
 }

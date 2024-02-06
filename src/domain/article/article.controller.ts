@@ -8,10 +8,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
-import { ArticleListDto } from './dto/article-list.dto';
-import { ArticleDto } from './dto/article.dto';
+import {
+  CreateArticleDto,
+  UpdateArticleDto,
+  ArticleListDto,
+  ArticleDto,
+} from './dto';
 import { DUMMY_ARTICLE } from './schema/article.dummy';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
