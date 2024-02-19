@@ -1,10 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
+import { CommonEntity } from '../../../common/CommonEntity';
 
 @Entity('user')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends CommonEntity {
   @Column({ length: 30 })
   email: string;
 
