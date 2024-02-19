@@ -16,9 +16,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtPayload } from '../../auth/jwt-payload';
-import { RequestUserId } from '../../auth/request-user-id';
 import { AuthService } from '../../auth/auth.service';
 import { JWT_CONSTANT } from '../../auth/auth.constant';
+import { NeedLogin } from '../../common/NeedLogin';
+import { RequestUserId } from '../../auth/request-user-id';
 
 @ApiTags('Users')
 @Controller('users')
@@ -39,7 +40,6 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '유저 로그인' })
-  // @UseGuards(AuthGuard('jwt-access'))
   @Post('login')
   public login(@Body() request: LoginUserDto, @Res() res: Response) {
     const user = this.userService.findByEmailAndPassword(
@@ -66,14 +66,18 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '로그인된 유저 조회' })
+  @NeedLogin()
   @Get()
-  public getCurrentUser(): UserDto {
+  public getCurrentUser(@RequestUserId() userId: number): UserDto {
+    console.log(userId);
+
     return {
       user: DUMMY_USER,
     };
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
+  @NeedLogin()
   @Put(':id')
   public updateUser(
     // @RequestUserId() userId: number | null,
@@ -104,6 +108,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '로그아웃' })
+  @NeedLogin()
   @Post('logout')
   public logout(@Req() req: Request, @Res() res: Response) {
     res
