@@ -19,7 +19,7 @@ import { JwtPayload } from '../../auth/jwt-payload';
 import { AuthService } from '../../auth/auth.service';
 import { JWT_CONSTANT } from '../../auth/auth.constant';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUserId } from '../../auth/request-user-id';
+import { RequestUser, RequestUserData } from '../../auth/request-user-id';
 
 @ApiTags('Users')
 @Controller('users')
@@ -49,7 +49,7 @@ export class UserController {
 
     const { accessToken, refreshToken } = this.authService.createToken(
       user.id,
-      user.email,
+      user.username,
     );
 
     res
@@ -68,8 +68,8 @@ export class UserController {
   @ApiOperation({ summary: '로그인된 유저 조회' })
   @NeedLogin()
   @Get()
-  public getCurrentUser(@RequestUserId() userId: number): UserDto {
-    console.log(userId);
+  public getCurrentUser(@RequestUserData() user: RequestUser): UserDto {
+    console.log(user);
 
     return {
       user: DUMMY_USER,
@@ -90,10 +90,9 @@ export class UserController {
   @Post('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const { refreshToken, sub } = req.user as JwtPayload & {
-      refreshToken: string;
-    };
-
+    // const { refreshToken, sub } = req.user as JwtPayload & {
+    //   refreshToken: string;
+    // };
     // const user = await this.userService.findByIdAndCheckRT(sub, refreshToken);
     //
     // const token = this.authService.getToken({ sub, email });
