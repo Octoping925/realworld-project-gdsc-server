@@ -31,26 +31,17 @@ export class UserController {
 
   @ApiOperation({ summary: '유저 생성' })
   @Post()
-  public createUser(@Body() createUserDto: CreateUserDto): UserDto {
-    this.userService.create(createUserDto);
-
-    const user = createUserDto.user;
-
-    return {
-      user: {
-        id: 1,
-        email: user.email,
-        username: user.username,
-        bio: DUMMY_USER.bio,
-        image: DUMMY_USER.image,
-      },
-    };
+  public async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserDto> {
+    const user = await this.userService.create(createUserDto);
+    return { user };
   }
 
   @ApiOperation({ summary: '유저 로그인' })
   @Post('login')
-  public login(@Body() request: LoginUserDto, @Res() res: Response) {
-    const user = this.userService.findByEmailAndPassword(
+  public async login(@Body() request: LoginUserDto, @Res() res: Response) {
+    const user = await this.userService.findByEmailAndPassword(
       request.user.email,
       request.user.password,
     );
@@ -76,25 +67,27 @@ export class UserController {
   @ApiOperation({ summary: '로그인된 유저 조회' })
   @NeedLogin()
   @Get()
-  public getCurrentUser(@RequestUserId() userId: number): UserDto {
-    return {
-      user: DUMMY_USER,
-    };
+  public async getCurrentUser(
+    @RequestUserId() userId: number,
+  ): Promise<UserDto> {
+    const user = await this.userService.findOne(userId);
+    return { user };
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
   @NeedLogin()
   @Put(':id')
-  public updateUser(
+  public async updateUser(
     @RequestUserId() userId: number,
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
+  ): Promise<UserDto> {
     if (userId !== id) {
       throw new UnauthorizedException();
     }
 
-    return this.userService.update(id, updateUserDto);
+    const user = await this.userService.update(id, updateUserDto);
+    return { user };
   }
 
   @Post('refresh')
