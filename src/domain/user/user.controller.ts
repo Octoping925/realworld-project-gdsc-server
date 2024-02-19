@@ -34,8 +34,16 @@ export class UserController {
   public createUser(@Body() createUserDto: CreateUserDto): UserDto {
     this.userService.create(createUserDto);
 
+    const user = createUserDto.user;
+
     return {
-      user: DUMMY_USER,
+      user: {
+        id: 1,
+        email: user.email,
+        username: user.username,
+        bio: DUMMY_USER.bio,
+        image: DUMMY_USER.image,
+      },
     };
   }
 
