@@ -1,5 +1,5 @@
-import { NewUser } from '../schema/new-user.schema';
+import { UpdateUser } from '../schema';
 
 export class UpdateUserDto {
-  user: NewUser;
+  user: UpdateUser;
 }

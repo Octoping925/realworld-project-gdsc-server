@@ -7,6 +7,7 @@ import {
   Put,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -15,11 +16,10 @@ import { DUMMY_USER } from './schema/user.dummy.schema';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtPayload } from '../../auth/jwt-payload';
 import { AuthService } from '../../auth/auth.service';
 import { JWT_CONSTANT } from '../../auth/auth.constant';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUser, RequestUserData } from '../../auth/request-user-id';
+import { RequestUserId } from '../../auth/request-user-id';
 
 @ApiTags('Users')
 @Controller('users')
@@ -68,9 +68,7 @@ export class UserController {
   @ApiOperation({ summary: '로그인된 유저 조회' })
   @NeedLogin()
   @Get()
-  public getCurrentUser(@RequestUserData() user: RequestUser): UserDto {
-    console.log(user);
-
+  public getCurrentUser(@RequestUserId() userId: number): UserDto {
     return {
       user: DUMMY_USER,
     };
@@ -80,11 +78,15 @@ export class UserController {
   @NeedLogin()
   @Put(':id')
   public updateUser(
-    // @RequestUserId() userId: number | null,
-    @Param('id') id: string,
+    @RequestUserId() userId: number,
+    @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(+id, updateUserDto);
+    if (userId !== id) {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.update(id, updateUserDto);
   }
 
   @Post('refresh')
