@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateArticleDto, UpdateArticleDto } from './dto';
 import { Article } from './schema/article.schema';
 import { Article as ArticleEntity } from './entities/article.entity';
 import { TagService } from '../tag/tag.service';
-import { UserService } from '../user/user.service';
 import { FollowService } from '../follow/follow.service';
 import { FavoriteService } from '../favorite/favorite.service';
 import { ProfileService } from '../user/profile.service';
@@ -16,9 +15,8 @@ export class ArticleService {
     @InjectRepository(ArticleEntity)
     private readonly articleRepository: Repository<ArticleEntity>,
     private readonly tagService: TagService,
-    private readonly userService: UserService,
     private readonly profileService: ProfileService,
-    private readonly followService: FollowService,
+    @Inject(forwardRef(() => FavoriteService))
     private readonly favoriteService: FavoriteService,
   ) {}
 

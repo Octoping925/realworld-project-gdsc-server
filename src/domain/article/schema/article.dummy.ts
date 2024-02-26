@@ -1,6 +1,7 @@
 import { Article } from './article.schema';
 
 export const DUMMY_ARTICLE: Article = {
+  id: 1,
   slug: 'dummy-article',
   title: 'dummy-article-title',
   description: 'dummy-description',
