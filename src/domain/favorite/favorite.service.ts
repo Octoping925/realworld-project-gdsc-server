@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Favorite } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ArticleService } from '../article/article.service';
 
 @Injectable()
 export class FavoriteService {
   constructor(
     @InjectRepository(Favorite)
     private readonly favoriteRepository: Repository<Favorite>,
+    private readonly articleService: ArticleService,
   ) {}
 
   public async getInfoByArticleId(
@@ -22,5 +24,47 @@ export class FavoriteService {
     const favoritesCount = await this.favoriteRepository.countBy({ articleId });
 
     return { favorited, favoritesCount };
+  }
+
+  public async favoriteArticle(requestUserId: number, slug: string) {
+    const article = await this.articleService.findOneBySlug(
+      requestUserId,
+      slug,
+    );
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    const isAlreadyFavorited = await this.favoriteRepository.existsBy({
+      userId: requestUserId,
+      articleId: article.id,
+    });
+
+    if (isAlreadyFavorited) {
+      throw new Error('Already favorited');
+    }
+
+    const favorite = new Favorite();
+    favorite.userId = requestUserId;
+    favorite.articleId = article.id;
+
+    await this.favoriteRepository.save(favorite);
+  }
+
+  public async unfavoriteArticle(requestUserId: number, slug: string) {
+    const article = await this.articleService.findOneBySlug(
+      requestUserId,
+      slug,
+    );
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    await this.favoriteRepository.delete({
+      userId: requestUserId,
+      articleId: article.id,
+    });
   }
 }
