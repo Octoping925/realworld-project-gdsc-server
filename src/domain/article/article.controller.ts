@@ -16,15 +16,20 @@ import {
 } from './dto';
 import { DUMMY_ARTICLE } from './schema/article.dummy';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { NeedLogin } from '../../common/NeedLogin';
 
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @NeedLogin()
   @ApiOperation({ summary: '피드 게시물 불러오기' })
   @Get('/feed')
-  public getFeed(): ArticleListDto {
+  public getFeed(
+    @Param('offset') offset: number,
+    @Param('limit') limit: number,
+  ): ArticleListDto {
     return {
       articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
       articlesCount: 2,
@@ -33,13 +38,20 @@ export class ArticleController {
 
   @ApiOperation({ summary: '최근 게시물 불러오기' })
   @Get()
-  public getRecentArticles(): ArticleListDto {
+  public getRecentArticles(
+    @Param('tag') tag: string,
+    @Param('author') author: string,
+    @Param('favorited') favorited: string,
+    @Param('offset') offset: number,
+    @Param('limit') limit: number,
+  ): ArticleListDto {
     return {
       articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
       articlesCount: 2,
     };
   }
 
+  @NeedLogin()
   @ApiOperation({ summary: '게시물 생성' })
   @Post()
   public createArticle(@Body() createArticleDto: CreateArticleDto): ArticleDto {
@@ -58,6 +70,7 @@ export class ArticleController {
     };
   }
 
+  @NeedLogin()
   @ApiOperation({ summary: '게시물 수정' })
   @Put(':slug')
   public updateArticle(
@@ -71,6 +84,7 @@ export class ArticleController {
     };
   }
 
+  @NeedLogin()
   @ApiOperation({ summary: '게시물 삭제' })
   @Delete(':slug')
   public removeArticle(@Param('slug') slug: string): void {
