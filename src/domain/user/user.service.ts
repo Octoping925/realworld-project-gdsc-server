@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './schema';
 import { User as UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,6 +52,16 @@ export class UserService {
     password: string,
   ): Promise<User> {
     const user = await this.userRepository.findOneBy({ email, password });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return User.fromEntity(user);
+  }
+
+  public async findByUsername(username: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ username });
 
     if (!user) {
       throw new Error('User not found');

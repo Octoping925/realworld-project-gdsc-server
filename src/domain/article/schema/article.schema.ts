@@ -1,9 +1,9 @@
 import { Profile } from '../../user/schema/profile.schema';
 import { Tag } from '../../tag/schema/Tag';
 import { Article as ArticleEntity } from '../entities/article.entity';
-import { User } from '../../user/schema';
 
 export class Article {
+  id: number;
   slug: string;
   title: string;
   description: string;
@@ -18,12 +18,12 @@ export class Article {
   static fromEntity(
     articleEntity: ArticleEntity,
     tags: Tag[],
-    author: User,
-    isAuthorFollowing: boolean,
+    author: Profile,
     favorited: boolean,
     favoritesCount: number,
   ) {
     const article = new Article();
+    article.id = articleEntity.id;
     article.slug = articleEntity.slug;
     article.title = articleEntity.title;
     article.description = articleEntity.description;
@@ -33,14 +33,7 @@ export class Article {
     article.updatedAt = articleEntity.updatedAt;
     article.favorited = favorited;
     article.favoritesCount = favoritesCount;
-
-    const profile = new Profile();
-    profile.username = author.username;
-    profile.bio = author.bio;
-    profile.image = author.image;
-    profile.following = isAuthorFollowing;
-
-    article.author = profile;
+    article.author = author;
 
     return article;
   }

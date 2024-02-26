@@ -8,6 +8,7 @@ import { TagService } from '../tag/tag.service';
 import { UserService } from '../user/user.service';
 import { FollowService } from '../follow/follow.service';
 import { FavoriteService } from '../favorite/favorite.service';
+import { ProfileService } from '../user/profile.service';
 
 @Injectable()
 export class ArticleService {
@@ -16,6 +17,7 @@ export class ArticleService {
     private readonly articleRepository: Repository<ArticleEntity>,
     private readonly tagService: TagService,
     private readonly userService: UserService,
+    private readonly profileService: ProfileService,
     private readonly followService: FollowService,
     private readonly favoriteService: FavoriteService,
   ) {}
@@ -64,10 +66,9 @@ export class ArticleService {
     article: ArticleEntity,
   ): Promise<Article> {
     const tags = await this.tagService.findByArticleId(article.id);
-    const authorEntity = await this.userService.findOne(article.authorId);
-    const isAuthorFollowing = await this.followService.isFollowing(
+    const authorEntity = await this.profileService.findById(
       requestUserId,
-      authorEntity.id,
+      article.authorId,
     );
 
     const { favorited, favoritesCount } =
@@ -77,7 +78,6 @@ export class ArticleService {
       article,
       tags,
       authorEntity,
-      isAuthorFollowing,
       favorited,
       favoritesCount,
     );
