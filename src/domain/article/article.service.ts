@@ -1,26 +1,128 @@
 import { Injectable } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateArticleDto, UpdateArticleDto } from './dto';
+import { Article } from './schema/article.schema';
+import { Article as ArticleEntity } from './entities/article.entity';
+import { TagService } from '../tag/tag.service';
+import { UserService } from '../user/user.service';
+import { FollowService } from '../follow/follow.service';
+import { FavoriteService } from '../favorite/favorite.service';
 
 @Injectable()
 export class ArticleService {
-  create(createArticleDto: CreateArticleDto) {
-    return 'This action adds a new article';
+  constructor(
+    @InjectRepository(ArticleEntity)
+    private readonly articleRepository: Repository<ArticleEntity>,
+    private readonly tagService: TagService,
+    private readonly userService: UserService,
+    private readonly followService: FollowService,
+    private readonly favoriteService: FavoriteService,
+  ) {}
+
+  public async create(
+    requestUserId: number,
+    dto: CreateArticleDto,
+  ): Promise<number> {
+    const articleEntity = new ArticleEntity();
+    articleEntity.slug = this.slugify(dto.article.title);
+    articleEntity.title = dto.article.title;
+    articleEntity.body = dto.article.body;
+    articleEntity.description = dto.article.description;
+    articleEntity.authorId = requestUserId;
+
+    await this.articleRepository.save(articleEntity);
+
+    return articleEntity.id;
   }
 
-  findAll() {
-    return `This action returns all article`;
+  public async findOne(
+    requestUserId: number | null,
+    articleId: number,
+  ): Promise<Article> {
+    const article = await this.articleRepository.findOneBy({ id: articleId });
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    return this.getArticleInfo(requestUserId, article);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} article`;
+  public async findOneBySlug(requestUserId: number, slug: string) {
+    const article = await this.articleRepository.findOneBy({ slug });
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    return this.getArticleInfo(requestUserId, article);
   }
 
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
+  private async getArticleInfo(
+    requestUserId: number | null,
+    article: ArticleEntity,
+  ): Promise<Article> {
+    const tags = await this.tagService.findByArticleId(article.id);
+    const authorEntity = await this.userService.findOne(article.authorId);
+    const isAuthorFollowing = await this.followService.isFollowing(
+      requestUserId,
+      authorEntity.id,
+    );
+
+    const { favorited, favoritesCount } =
+      await this.favoriteService.getInfoByArticleId(requestUserId, article.id);
+
+    return Article.fromEntity(
+      article,
+      tags,
+      authorEntity,
+      isAuthorFollowing,
+      favorited,
+      favoritesCount,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} article`;
+  public async update(
+    requestUserId: number,
+    slug: string,
+    dto: UpdateArticleDto,
+  ): Promise<void> {
+    const article = await this.articleRepository.findOneBy({ slug });
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    if (article.authorId !== requestUserId) {
+      throw new Error('권한이 없습니다');
+    }
+
+    await this.articleRepository.update(article.id, {
+      title: dto.article.title,
+      description: dto.article.description,
+      body: dto.article.body,
+    });
+  }
+
+  public async remove(requestUserId: number, slug: string): Promise<void> {
+    const article = await this.articleRepository.findOneBy({ slug });
+
+    if (!article) {
+      throw new Error('Article not found');
+    }
+
+    if (article.authorId !== requestUserId) {
+      throw new Error('권한이 없습니다');
+    }
+
+    await this.articleRepository.remove(article);
+  }
+
+  private slugify(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
   }
 }

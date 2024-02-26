@@ -17,6 +17,7 @@ import {
 import { DUMMY_ARTICLE } from './schema/article.dummy';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
+import { RequestUserId } from '../../auth/request-user-id';
 
 @ApiTags('Articles')
 @Controller('articles')
@@ -54,40 +55,55 @@ export class ArticleController {
   @NeedLogin()
   @ApiOperation({ summary: '게시물 생성' })
   @Post()
-  public createArticle(@Body() createArticleDto: CreateArticleDto): ArticleDto {
-    this.articleService.create(createArticleDto);
+  public async createArticle(
+    @RequestUserId() requestUserId: number,
+    @Body() dto: CreateArticleDto,
+  ): Promise<ArticleDto> {
+    const articleId = await this.articleService.create(requestUserId, dto);
+    const article = await this.articleService.findOne(requestUserId, articleId);
 
-    return {
-      article: DUMMY_ARTICLE,
-    };
+    return { article };
   }
 
   @ApiOperation({ summary: '게시물 조회' })
   @Get(':slug')
-  public findArticle(@Param('slug') slug: string): ArticleDto {
-    return {
-      article: DUMMY_ARTICLE,
-    };
+  public async findArticle(
+    @RequestUserId() requestUserId: number | null, // 로그인이 안되어있을 경우?
+    @Param('slug') slug: string,
+  ): Promise<ArticleDto> {
+    const article = await this.articleService.findOneBySlug(
+      requestUserId,
+      slug,
+    );
+
+    return { article };
   }
 
   @NeedLogin()
   @ApiOperation({ summary: '게시물 수정' })
   @Put(':slug')
-  public updateArticle(
+  public async updateArticle(
+    @RequestUserId() requestUserId: number,
     @Param('slug') slug: string,
     @Body() updateArticleDto: UpdateArticleDto,
-  ): ArticleDto {
-    this.articleService.update(+slug, updateArticleDto);
+  ): Promise<ArticleDto> {
+    await this.articleService.update(requestUserId, slug, updateArticleDto);
 
-    return {
-      article: DUMMY_ARTICLE,
-    };
+    const article = await this.articleService.findOneBySlug(
+      requestUserId,
+      slug,
+    );
+
+    return { article };
   }
 
   @NeedLogin()
   @ApiOperation({ summary: '게시물 삭제' })
   @Delete(':slug')
-  public removeArticle(@Param('slug') slug: string): void {
-    this.articleService.remove(+slug);
+  public async removeArticle(
+    @RequestUserId() requestUserId: number,
+    @Param('slug') slug: string,
+  ): Promise<void> {
+    await this.articleService.remove(requestUserId, slug);
   }
 }
