@@ -3,7 +3,6 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentListDto } from './dto/comment-list.dto';
 import { CommentDto } from './dto/comment.dto';
-import { DUMMY_COMMENT } from './schema/comment.dummy.schema';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
 import { RequestUserId } from '../../auth/request-user-id';
@@ -38,11 +37,18 @@ export class CommentController {
     @Param('slug') slug: string,
     @Body() createCommentDto: CreateCommentDto,
   ): Promise<CommentDto> {
-    this.commentService.create(createCommentDto);
+    const commentId = await this.commentService.create(
+      requestUserId,
+      slug,
+      createCommentDto,
+    );
 
-    return {
-      comment: DUMMY_COMMENT,
-    };
+    const comment = await this.commentService.findById(
+      requestUserId,
+      commentId,
+    );
+
+    return { comment };
   }
 
   @NeedLogin()
@@ -51,8 +57,8 @@ export class CommentController {
   public async removeComment(
     @RequestUserId() requestUserId: number,
     @Param('slug') slug: string,
-    @Param('id') id: string,
+    @Param('id') id: number,
   ): Promise<void> {
-    this.commentService.remove(+id);
+    await this.commentService.remove(requestUserId, id);
   }
 }

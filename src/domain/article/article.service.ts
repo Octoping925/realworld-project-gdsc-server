@@ -65,6 +65,16 @@ export class ArticleService {
     return this.getArticleInfo(requestUserId, article);
   }
 
+  public async findIdBySlug(slug: string): Promise<number> {
+    const article = await this.articleRepository.findOneBy({ slug });
+
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+
+    return article.id;
+  }
+
   private async getArticleInfo(
     requestUserId: number | null,
     article: ArticleEntity,

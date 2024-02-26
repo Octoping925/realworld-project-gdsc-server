@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment as CommentEntity } from './entities/comment.entity';
 import { ArticleService } from '../article/article.service';
 import { Comment } from './schema/comment.schema';
-import { UserService } from '../user/user.service';
-import { Profile } from '../user/schema';
-import { FollowService } from '../follow/follow.service';
+import { ProfileService } from '../user/profile.service';
 
 @Injectable()
 export class CommentService {
@@ -15,51 +17,75 @@ export class CommentService {
     @InjectRepository(CommentEntity)
     private readonly commentRepository: Repository<CommentEntity>,
     private readonly articleService: ArticleService,
-    private readonly userService: UserService,
-    private readonly followService: FollowService,
+    private readonly profileService: ProfileService,
   ) {}
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
-  }
-
-  findAll() {
-    return `This action returns all comment`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
-  }
 
   public async findByArticleSlug(
     requestUserId: number | null,
     slug: string,
   ): Promise<Comment[]> {
-    const article = await this.articleService.findOneBySlug(
-      requestUserId,
-      slug,
-    );
-
-    const comments = await this.commentRepository.findBy({
-      articleId: article.id,
-    });
+    const articleId = await this.articleService.findIdBySlug(slug);
+    const comments = await this.commentRepository.findBy({ articleId });
 
     const authors = await Promise.all(
-      comments.map(async (c) => {
-        const author = await this.userService.findOne(c.userId);
-        const isFollowing = await this.followService.isFollowing(
-          requestUserId,
-          author.id,
-        );
-        return Profile.fromUserSchema(author, isFollowing);
-      }),
+      comments.map(
+        async (c) =>
+          await this.profileService.findById(requestUserId, c.userId),
+      ),
     );
 
     return comments.map((comment, idx) =>
       Comment.fromEntity(comment, authors[idx]),
     );
+  }
+
+  public async findById(requestUserId: number | null, commentId: number) {
+    const comment = await this.commentRepository.findOneBy({
+      id: commentId,
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    const author = await this.profileService.findById(
+      requestUserId,
+      comment.userId,
+    );
+
+    return Comment.fromEntity(comment, author);
+  }
+
+  public async create(
+    requestUserId: number,
+    slug: string,
+    dto: CreateCommentDto,
+  ): Promise<number> {
+    const articleId = await this.articleService.findIdBySlug(slug);
+
+    const comment = new CommentEntity();
+    comment.userId = requestUserId;
+    comment.body = dto.comment.body;
+    comment.articleId = articleId;
+
+    await this.commentRepository.save(comment);
+
+    return comment.id;
+  }
+
+  public async remove(requestUserId: number, commentId: number): Promise<void> {
+    const comment = await this.commentRepository.findOneBy({
+      id: commentId,
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    if (comment.userId !== requestUserId) {
+      throw new ForbiddenException('You are not the author of this comment');
+    }
+
+    await this.commentRepository.remove(comment);
   }
 }

@@ -60,18 +60,11 @@ export class FavoriteService {
   }
 
   public async unfavoriteArticle(requestUserId: number, slug: string) {
-    const article = await this.articleService.findOneBySlug(
-      requestUserId,
-      slug,
-    );
-
-    if (!article) {
-      throw new NotFoundException('Article not found');
-    }
+    const articleId = await this.articleService.findIdBySlug(slug);
 
     await this.favoriteRepository.delete({
       userId: requestUserId,
-      articleId: article.id,
+      articleId,
     });
   }
 }
