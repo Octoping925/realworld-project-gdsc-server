@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Follow as FollowEntity } from './entities/follow.entity';
@@ -30,16 +34,16 @@ export class FollowService {
     const user = await this.userService.findByUsername(username);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (requestUserId === user.id) {
-      throw new Error('You cannot follow yourself');
+      throw new BadRequestException('You cannot follow yourself');
     }
 
     const isAlreadyFollowing = await this.isFollowing(requestUserId, user.id);
     if (isAlreadyFollowing) {
-      throw new Error('Already following');
+      throw new BadRequestException('Already following');
     }
 
     const follow = new FollowEntity();
@@ -53,7 +57,7 @@ export class FollowService {
     const user = await this.userService.findByUsername(username);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     await this.followRepository.delete({

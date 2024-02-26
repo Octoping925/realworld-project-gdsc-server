@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateArticleDto, UpdateArticleDto } from './dto';
@@ -43,7 +49,7 @@ export class ArticleService {
     const article = await this.articleRepository.findOneBy({ id: articleId });
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     return this.getArticleInfo(requestUserId, article);
@@ -53,7 +59,7 @@ export class ArticleService {
     const article = await this.articleRepository.findOneBy({ slug });
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     return this.getArticleInfo(requestUserId, article);
@@ -89,11 +95,11 @@ export class ArticleService {
     const article = await this.articleRepository.findOneBy({ slug });
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     if (article.authorId !== requestUserId) {
-      throw new Error('권한이 없습니다');
+      throw new ForbiddenException('권한이 없습니다');
     }
 
     await this.articleRepository.update(article.id, {
@@ -107,11 +113,11 @@ export class ArticleService {
     const article = await this.articleRepository.findOneBy({ slug });
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     if (article.authorId !== requestUserId) {
-      throw new Error('권한이 없습니다');
+      throw new ForbiddenException('권한이 없습니다');
     }
 
     await this.articleRepository.remove(article);

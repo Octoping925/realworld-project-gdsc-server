@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Favorite } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,7 +40,7 @@ export class FavoriteService {
     );
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     const isAlreadyFavorited = await this.favoriteRepository.existsBy({
@@ -43,7 +49,7 @@ export class FavoriteService {
     });
 
     if (isAlreadyFavorited) {
-      throw new Error('Already favorited');
+      throw new BadRequestException('Already favorited');
     }
 
     const favorite = new Favorite();
@@ -60,7 +66,7 @@ export class FavoriteService {
     );
 
     if (!article) {
-      throw new Error('Article not found');
+      throw new NotFoundException('Article not found');
     }
 
     await this.favoriteRepository.delete({

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User as UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -20,7 +20,7 @@ export class ProfileService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const isFollowing = await this.followService.isFollowing(
@@ -38,7 +38,7 @@ export class ProfileService {
     const user = await this.userRepository.findOneBy({ username });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const isFollowing = await this.followService.isFollowing(

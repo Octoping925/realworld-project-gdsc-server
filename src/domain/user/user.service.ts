@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './schema';
 import { User as UserEntity } from './entities/user.entity';
@@ -23,7 +23,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return User.fromEntity(user);
@@ -33,7 +33,7 @@ export class UserService {
     const isExistUser = await this.userRepository.exists({ where: { id } });
 
     if (!isExistUser) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     await this.userRepository.update(id, {
@@ -54,7 +54,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ email, password });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return User.fromEntity(user);
@@ -64,7 +64,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ username });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return User.fromEntity(user);
