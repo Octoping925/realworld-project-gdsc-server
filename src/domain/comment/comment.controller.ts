@@ -5,6 +5,8 @@ import { CommentListDto } from './dto/comment-list.dto';
 import { CommentDto } from './dto/comment.dto';
 import { DUMMY_COMMENT } from './schema/comment.dummy.schema';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { NeedLogin } from '../../common/NeedLogin';
+import { RequestUserId } from '../../auth/request-user-id';
 
 @ApiTags('Comments')
 @Controller('article/:slug/comments')
@@ -13,21 +15,29 @@ export class CommentController {
 
   @ApiOperation({ summary: '게시물 댓글 불러오기' })
   @Get()
-  public findCommentsOfArticle(@Param('slug') slug: string): CommentListDto {
-    this.commentService.findAll();
+  public async findCommentsOfArticle(
+    @RequestUserId() requestUserId: number | null,
+    @Param('slug') slug: string,
+  ): Promise<CommentListDto> {
+    const comments = await this.commentService.findByArticleSlug(
+      requestUserId,
+      slug,
+    );
 
     return {
-      comments: [DUMMY_COMMENT, DUMMY_COMMENT, DUMMY_COMMENT],
-      commentsCount: 3,
+      comments,
+      commentsCount: comments.length,
     };
   }
 
+  @NeedLogin()
   @ApiOperation({ summary: '게시물 댓글 생성' })
   @Post()
-  public createComment(
+  public async createComment(
+    @RequestUserId() requestUserId: number,
     @Param('slug') slug: string,
     @Body() createCommentDto: CreateCommentDto,
-  ): CommentDto {
+  ): Promise<CommentDto> {
     this.commentService.create(createCommentDto);
 
     return {
@@ -35,12 +45,14 @@ export class CommentController {
     };
   }
 
+  @NeedLogin()
   @ApiOperation({ summary: '게시물 댓글 삭제' })
   @Delete(':id')
-  public removeComment(
+  public async removeComment(
+    @RequestUserId() requestUserId: number,
     @Param('slug') slug: string,
     @Param('id') id: string,
-  ): void {
+  ): Promise<void> {
     this.commentService.remove(+id);
   }
 }
