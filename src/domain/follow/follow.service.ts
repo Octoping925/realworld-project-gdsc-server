@@ -65,4 +65,12 @@ export class FollowService {
       followingId: user.id,
     });
   }
+
+  public async getFollowerIds(userId: number): Promise<number[]> {
+    const followers = await this.followRepository.find({
+      where: { followingId: userId },
+    });
+
+    return followers.map((follow) => follow.followerId);
+  }
 }

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateArticleDto, UpdateArticleDto } from './dto';
 import { Article } from './schema/article.schema';
 import { Article as ArticleEntity } from './entities/article.entity';
@@ -24,6 +24,7 @@ export class ArticleService {
     private readonly profileService: ProfileService,
     @Inject(forwardRef(() => FavoriteService))
     private readonly favoriteService: FavoriteService,
+    private readonly followService: FollowService,
   ) {}
 
   public async create(
@@ -131,6 +132,29 @@ export class ArticleService {
     }
 
     await this.articleRepository.remove(article);
+  }
+
+  public async findFeed(
+    requestUserId: number,
+    offset: number,
+    limit: number,
+  ): Promise<Article[]> {
+    const followerIds = await this.followService.getFollowerIds(requestUserId);
+
+    if (followerIds.length === 0) {
+      return [];
+    }
+
+    const articles = await this.articleRepository.find({
+      where: { authorId: In(followerIds) },
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    });
+
+    return Promise.all(
+      articles.map((article) => this.getArticleInfo(requestUserId, article)),
+    );
   }
 
   private slugify(title: string): string {

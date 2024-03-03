@@ -18,6 +18,7 @@ import { DUMMY_ARTICLE } from './schema/article.dummy';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
 import { RequestUserId } from '../../auth/request-user-id';
+import { FollowService } from '../follow/follow.service';
 
 @ApiTags('Articles')
 @Controller('articles')
@@ -27,25 +28,33 @@ export class ArticleController {
   @NeedLogin()
   @ApiOperation({ summary: '피드 게시물 불러오기' })
   @Get('/feed')
-  public getFeed(
+  public async getFeed(
+    @RequestUserId() requestUserId: number,
     @Param('offset') offset: number,
     @Param('limit') limit: number,
-  ): ArticleListDto {
+  ): Promise<ArticleListDto> {
+    const articles = await this.articleService.findFeed(
+      requestUserId,
+      offset,
+      limit,
+    );
+
     return {
-      articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
-      articlesCount: 2,
+      articles,
+      articlesCount: articles.length,
     };
   }
 
   @ApiOperation({ summary: '최근 게시물 불러오기' })
   @Get()
-  public getRecentArticles(
-    @Param('tag') tag: string,
-    @Param('author') author: string,
-    @Param('favorited') favorited: string,
+  public async getRecentArticles(
+    @RequestUserId() requestUserId: number | null,
+    @Param('tag') tag: string | null,
+    @Param('author') author: string | null,
+    @Param('favorited') favorited: string | null,
     @Param('offset') offset: number,
     @Param('limit') limit: number,
-  ): ArticleListDto {
+  ): Promise<ArticleListDto> {
     return {
       articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
       articlesCount: 2,
