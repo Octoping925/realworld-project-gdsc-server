@@ -7,7 +7,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      'https://https://realworld-project-gdsc-client.vercel.app/',
+      'https://realworld-project-gdsc-client.vercel.app/',
     ],
     credentials: true,
     exposedHeaders: ['Authorization'],
