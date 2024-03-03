@@ -10,9 +10,8 @@ export class TagController {
 
   @ApiOperation({ summary: '인기 태그 불러오기' })
   @Get()
-  public findAllTag(): TagListDto {
-    return {
-      tags: ['tag1', 'tag2'],
-    };
+  public async findAllTag(): Promise<TagListDto> {
+    const tags = await this.tagService.findAllTag();
+    return { tags };
   }
 }

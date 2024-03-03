@@ -26,4 +26,9 @@ export class TagService {
 
     await this.tagRepository.save(tags);
   }
+
+  public async findAllTag(): Promise<Tag[]> {
+    const tags = await this.tagRepository.find();
+    return tags.map((tag) => tag.name);
+  }
 }
