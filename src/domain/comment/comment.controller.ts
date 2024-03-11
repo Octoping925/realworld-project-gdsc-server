@@ -18,14 +18,14 @@ export class CommentController {
     @RequestUserId() requestUserId: number | null,
     @Param('slug') slug: string,
   ): Promise<CommentListDto> {
-    const comments = await this.commentService.findByArticleSlug(
+    const { comments, count } = await this.commentService.findByArticleSlug(
       requestUserId,
       slug,
     );
 
     return {
       comments,
-      commentsCount: comments.length,
+      commentsCount: count,
     };
   }
 

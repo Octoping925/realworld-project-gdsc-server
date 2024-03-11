@@ -14,6 +14,7 @@ import { TagService } from '../tag/tag.service';
 import { FollowService } from '../follow/follow.service';
 import { FavoriteService } from '../favorite/favorite.service';
 import { ProfileService } from '../user/profile.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ArticleService {
@@ -25,6 +26,7 @@ export class ArticleService {
     @Inject(forwardRef(() => FavoriteService))
     private readonly favoriteService: FavoriteService,
     private readonly followService: FollowService,
+    private readonly userService: UserService,
   ) {}
 
   public async create(
@@ -138,11 +140,14 @@ export class ArticleService {
     requestUserId: number,
     offset: number,
     limit: number,
-  ): Promise<Article[]> {
+  ): Promise<{ articles: Article[]; count: number }> {
     const followerIds = await this.followService.getFollowerIds(requestUserId);
 
     if (followerIds.length === 0) {
-      return [];
+      return {
+        articles: [],
+        count: 0,
+      };
     }
 
     const articles = await this.articleRepository.find({
@@ -152,9 +157,78 @@ export class ArticleService {
       skip: offset,
     });
 
-    return Promise.all(
-      articles.map((article) => this.getArticleInfo(requestUserId, article)),
-    );
+    const articleCount = await this.articleRepository.count({
+      where: { authorId: In(followerIds) },
+    });
+
+    return {
+      articles: await Promise.all(
+        articles.map((article) => this.getArticleInfo(requestUserId, article)),
+      ),
+      count: articleCount,
+    };
+  }
+
+  public async findRecent(
+    requestUserId: number | null,
+    tag: string | undefined,
+    author: string | undefined,
+    favorited: string | undefined,
+    offset: number,
+    limit: number,
+  ): Promise<{ articles: Article[]; count: number }> {
+    let targetArticleIds: number[] | null = null;
+    let targetAuthorId: number | null = null;
+
+    if (tag) {
+      const tags = await this.tagService.findByTagName(tag);
+      const articleIds = tags.map((tag) => tag.articleId);
+      targetArticleIds = [...(targetArticleIds ?? []), ...articleIds];
+    }
+
+    if (author) {
+      targetAuthorId = (await this.userService.findByUsername(author)).id;
+    }
+
+    if (favorited) {
+      const favoritedUserId = (await this.userService.findByUsername(favorited))
+        .id;
+      const favorites =
+        await this.favoriteService.findAllByUserId(favoritedUserId);
+
+      const favoritedArticleIds = favorites.map(
+        (favorite) => favorite.articleId,
+      );
+
+      targetArticleIds = [...(targetArticleIds ?? []), ...favoritedArticleIds];
+    }
+
+    const whereOption = {};
+    if (targetArticleIds !== null) {
+      whereOption['id'] = In(targetArticleIds);
+    }
+
+    if (targetAuthorId) {
+      whereOption['authorId'] = targetAuthorId;
+    }
+
+    const articles = await this.articleRepository.find({
+      where: whereOption,
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    });
+
+    const articleCount = await this.articleRepository.count({
+      where: whereOption,
+    });
+
+    return {
+      articles: await Promise.all(
+        articles.map((article) => this.getArticleInfo(requestUserId, article)),
+      ),
+      count: articleCount,
+    };
   }
 
   private slugify(title: string): string {

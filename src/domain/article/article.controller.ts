@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import {
@@ -14,11 +15,9 @@ import {
   ArticleListDto,
   ArticleDto,
 } from './dto';
-import { DUMMY_ARTICLE } from './schema/article.dummy';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
 import { RequestUserId } from '../../auth/request-user-id';
-import { FollowService } from '../follow/follow.service';
 
 @ApiTags('Articles')
 @Controller('articles')
@@ -30,10 +29,10 @@ export class ArticleController {
   @Get('/feed')
   public async getFeed(
     @RequestUserId() requestUserId: number,
-    @Param('offset') offset: number,
-    @Param('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
   ): Promise<ArticleListDto> {
-    const articles = await this.articleService.findFeed(
+    const { articles, count } = await this.articleService.findFeed(
       requestUserId,
       offset,
       limit,
@@ -41,23 +40,35 @@ export class ArticleController {
 
     return {
       articles,
-      articlesCount: articles.length,
+      articlesCount: count,
     };
   }
 
   @ApiOperation({ summary: '최근 게시물 불러오기' })
   @Get()
+  @ApiQuery({ name: 'tag', required: false })
+  @ApiQuery({ name: 'author', required: false })
+  @ApiQuery({ name: 'favorited', required: false })
   public async getRecentArticles(
     @RequestUserId() requestUserId: number | null,
-    @Param('tag') tag: string | null,
-    @Param('author') author: string | null,
-    @Param('favorited') favorited: string | null,
-    @Param('offset') offset: number,
-    @Param('limit') limit: number,
+    @Query('tag') tag: string | null,
+    @Query('author') author: string | null,
+    @Query('favorited') favorited: string | null,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
   ): Promise<ArticleListDto> {
+    const { articles, count } = await this.articleService.findRecent(
+      requestUserId,
+      tag,
+      author,
+      favorited,
+      offset,
+      limit,
+    );
+
     return {
-      articles: [DUMMY_ARTICLE, DUMMY_ARTICLE],
-      articlesCount: 2,
+      articles,
+      articlesCount: count,
     };
   }
 

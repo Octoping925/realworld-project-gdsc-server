@@ -67,4 +67,8 @@ export class FavoriteService {
       articleId,
     });
   }
+
+  public async findAllByUserId(favoritedUserId: number): Promise<Favorite[]> {
+    return await this.favoriteRepository.findBy({ userId: favoritedUserId });
+  }
 }

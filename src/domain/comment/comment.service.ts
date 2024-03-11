@@ -23,7 +23,7 @@ export class CommentService {
   public async findByArticleSlug(
     requestUserId: number | null,
     slug: string,
-  ): Promise<Comment[]> {
+  ): Promise<{ comments: Comment[]; count: number }> {
     const articleId = await this.articleService.findIdBySlug(slug);
     const comments = await this.commentRepository.findBy({ articleId });
 
@@ -34,9 +34,14 @@ export class CommentService {
       ),
     );
 
-    return comments.map((comment, idx) =>
-      Comment.fromEntity(comment, authors[idx]),
-    );
+    const commentCount = await this.commentRepository.countBy({ articleId });
+
+    return {
+      comments: comments.map((comment, idx) =>
+        Comment.fromEntity(comment, authors[idx]),
+      ),
+      count: commentCount,
+    };
   }
 
   public async findById(requestUserId: number | null, commentId: number) {

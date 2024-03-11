@@ -31,4 +31,8 @@ export class TagService {
     const tags = await this.tagRepository.find();
     return tags.map((tag) => tag.name);
   }
+
+  public async findByTagName(tagName: string): Promise<TagEntity[]> {
+    return await this.tagRepository.findBy({ name: tagName });
+  }
 }
