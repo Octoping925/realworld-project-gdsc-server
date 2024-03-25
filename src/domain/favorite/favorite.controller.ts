@@ -1,9 +1,10 @@
 import { Controller, Delete, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FavoriteService } from '.';
+import { FavoriteService } from './favorite.service';
+import { ArticleDto } from '../article/dto';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUserId } from '../../auth';
-import { ArticleService, ArticleDto } from '../article';
+import { RequestUserId } from '../../auth/request-user-id';
+import { ArticleService } from '../article/article.service';
 
 @ApiTags('Favorites')
 @Controller('articles/:slug/favorite')

@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JWT_CONSTANT } from '.';
-import { JWT_SECRET } from '../config/jwt.config';
-import jwt from 'jsonwebtoken';
+import { User } from '../domain/user/schema';
+import { JWT_CONSTANT } from './auth.constant';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public validateToken(token: string): boolean {
-    try {
-      jwt.verify(token, JWT_SECRET);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  public async validateToken(token: string) {
+    const payload = this.jwtService.sign({ sub: 1, email: token });
+
+    return {
+      accessToken: payload,
+    };
   }
 
   public createToken(userId: number, email: string) {

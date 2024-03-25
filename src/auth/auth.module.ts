@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { RefreshTokenStrategy } from './refresh-token.strategy';
+import { AccessTokenStrategy } from './access-token.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
 import { JWT_SECRET } from '../config/jwt.config';
-import { AuthService, AccessTokenStrategy, RefreshTokenStrategy } from '.';
 
 @Module({
   imports: [

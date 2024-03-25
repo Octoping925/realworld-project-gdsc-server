@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { TagService, TagListDto } from '.';
+import { TagService } from './tag.service';
+import { TagListDto } from './dto/tag-list.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Tags')

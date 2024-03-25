@@ -10,23 +10,15 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import {
-  UserService,
-  CreateUserDto,
-  LoginUserDto,
-  UpdateUserDto,
-  UserDto,
-} from '.';
+import { UserService } from './user.service';
+import { CreateUserDto, UpdateUserDto, LoginUserDto, UserDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  AuthService,
-  JWT_CONSTANT,
-  JwtPayload,
-  RequestUserId,
-} from '../../auth';
+import { AuthService } from '../../auth/auth.service';
+import { JWT_CONSTANT } from '../../auth/auth.constant';
 import { NeedLogin } from '../../common/NeedLogin';
+import { RequestUserId } from '../../auth/request-user-id';
 
 @ApiTags('Users')
 @Controller('users')
@@ -47,10 +39,7 @@ export class UserController {
 
   @ApiOperation({ summary: '유저 로그인' })
   @Post('login')
-  public async login(
-    @Body() request: LoginUserDto,
-    @Res() res: Response,
-  ): Promise<void> {
+  public async login(@Body() request: LoginUserDto, @Res() res: Response) {
     const user = await this.userService.findByEmailAndPassword(
       request.user.email,
       request.user.password,
@@ -102,32 +91,21 @@ export class UserController {
 
   @Post('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
-  async refreshToken(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const { refreshToken, sub } = req.user as JwtPayload & {
-      refreshToken: string;
-    };
-
-    if (!this.authService.validateToken(refreshToken)) {
-      res.status(401).json({ message: 'Invalid token' });
-      return;
-    }
-
-    const user = await this.userService.findOne(sub);
-
-    const { accessToken, refreshToken: newRefreshToken } =
-      this.authService.createToken(user.id, user.username);
-
-    res
-      .status(200)
-      .cookie(JWT_CONSTANT.ACCESS_TOKEN_NAME, accessToken, {
-        httpOnly: true,
-        expires: new Date(Date.now() + JWT_CONSTANT.ACCESS_TOKEN_EXPIRE),
-      })
-      .cookie(JWT_CONSTANT.REFRESH_TOKEN_NAME, newRefreshToken, {
-        httpOnly: true,
-        expires: new Date(Date.now() + JWT_CONSTANT.REFRESH_TOKEN_EXPIRE),
-      })
-      .json({ user });
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    // const { refreshToken, sub } = req.user as JwtPayload & {
+    //   refreshToken: string;
+    // };
+    // const user = await this.userService.findByIdAndCheckRT(sub, refreshToken);
+    //
+    // const token = this.authService.getToken({ sub, email });
+    //
+    // res
+    //   .cookie('access-token', token.accessToken)
+    //   .cookie('refresh-token', token.refreshToken);
+    //
+    // await this.userService.updateHashedRefreshToken(user.id, refreshToken);
+    //
+    // res.redirect('/');
   }
 
   @ApiOperation({ summary: '로그아웃' })

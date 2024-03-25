@@ -1,10 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { ArticleController, ArticleService, Article } from '.';
+import { ArticleService } from './article.service';
+import { ArticleController } from './article.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from '../user';
-import { TagModule } from '../tag';
-import { FavoriteModule } from '../favorite';
-import { FollowModule } from '../follow';
+import { Article } from './entities/article.entity';
+import { UserModule } from '../user/user.module';
+import { TagModule } from '../tag/tag.module';
+import { FavoriteModule } from '../favorite/favorite.module';
+import { FollowModule } from '../follow/follow.module';
 
 @Module({
   imports: [

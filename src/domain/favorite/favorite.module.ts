@@ -1,7 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { FavoriteService } from './favorite.service';
+import { FavoriteController } from './favorite.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FavoriteController, FavoriteService, Favorite } from '.';
-import { ArticleModule } from '../article';
+import { Favorite } from './entities/favorite.entity';
+import { ArticleModule } from '../article/article.module';
 
 @Module({
   imports: [
