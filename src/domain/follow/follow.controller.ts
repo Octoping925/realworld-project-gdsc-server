@@ -1,10 +1,9 @@
 import { Controller, Delete, Param, Post } from '@nestjs/common';
-import { FollowService } from './follow.service';
-import { ProfileDto } from '../user/dto';
+import { FollowService } from '.';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUserId } from '../../auth/request-user-id';
-import { ProfileService } from '../user/profile.service';
+import { RequestUserId } from '../../auth';
+import { ProfileService, ProfileDto } from '../user';
 
 @ApiTags('Follows')
 @Controller('profiles/:username/follow')

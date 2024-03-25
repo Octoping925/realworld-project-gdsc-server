@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Tag as TagEntity } from './entities/tag.entity';
+import { Tag as TagEntity } from '.';
 import { Tag } from './schema/Tag';
 
 @Injectable()

@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { CommentListDto } from './dto/comment-list.dto';
-import { CommentDto } from './dto/comment.dto';
+import {
+  CommentService,
+  CreateCommentDto,
+  CommentListDto,
+  CommentDto,
+} from '.';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUserId } from '../../auth/request-user-id';
+import { RequestUserId } from '../../auth';
 
 @ApiTags('Comments')
 @Controller('article/:slug/comments')

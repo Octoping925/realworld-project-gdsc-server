@@ -1,11 +1,13 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
-import { AuthModule } from '../../auth/auth.module';
+import {
+  UserService,
+  UserController,
+  User as UserEntity,
+  ProfileService,
+} from '.';
+import { AuthModule } from '../../auth';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User as UserEntity } from './entities/user.entity';
-import { ProfileService } from './profile.service';
-import { FollowModule } from '../follow/follow.module';
+import { FollowModule } from '../follow';
 
 @Module({
   imports: [

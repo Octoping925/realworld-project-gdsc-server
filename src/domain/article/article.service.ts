@@ -7,14 +7,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { CreateArticleDto, UpdateArticleDto } from './dto';
 import { Article } from './schema/article.schema';
-import { Article as ArticleEntity } from './entities/article.entity';
-import { TagService } from '../tag/tag.service';
-import { FollowService } from '../follow/follow.service';
-import { FavoriteService } from '../favorite/favorite.service';
-import { ProfileService } from '../user/profile.service';
-import { UserService } from '../user/user.service';
+import {
+  Article as ArticleEntity,
+  CreateArticleDto,
+  UpdateArticleDto,
+} from '.';
+import { TagService } from '../tag';
+import { FollowService } from '../follow';
+import { FavoriteService } from '../favorite';
+import { ProfileService, UserService } from '../user';
 
 @Injectable()
 export class ArticleService {

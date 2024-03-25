@@ -8,16 +8,16 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ArticleService } from './article.service';
 import {
+  ArticleService,
   CreateArticleDto,
   UpdateArticleDto,
   ArticleListDto,
   ArticleDto,
-} from './dto';
+} from '.';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NeedLogin } from '../../common/NeedLogin';
-import { RequestUserId } from '../../auth/request-user-id';
+import { RequestUserId } from '../../auth';
 
 @ApiTags('Articles')
 @Controller('articles')

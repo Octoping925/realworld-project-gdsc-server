@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User as UserEntity } from './entities/user.entity';
+import { User as UserEntity } from '.';
 import { Repository } from 'typeorm';
 import { Profile } from './schema';
-import { FollowService } from '../follow/follow.service';
+import { FollowService } from '../follow';
 
 @Injectable()
 export class ProfileService {

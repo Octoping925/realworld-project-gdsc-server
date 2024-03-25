@@ -4,3 +4,8 @@ export const JWT_CONSTANT = {
   ACCESS_TOKEN_EXPIRE: 60 * 60 * 1000,
   REFRESH_TOKEN_EXPIRE: 60 * 60 * 1000,
 } as const;
+
+export type JwtPayload = {
+  sub: number;
+  email: string;
+};

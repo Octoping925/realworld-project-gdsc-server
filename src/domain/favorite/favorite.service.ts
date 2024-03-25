@@ -5,10 +5,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Favorite } from './entities/favorite.entity';
+import { Favorite } from '.';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleService } from '../article/article.service';
+import { ArticleService } from '../article';
 
 @Injectable()
 export class FavoriteService {
