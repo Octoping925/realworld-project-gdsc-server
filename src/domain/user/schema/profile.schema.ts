@@ -16,14 +16,4 @@ export class Profile {
 
     return profile;
   }
-
-  static fromUserSchema(user: User, isFollowing: boolean): Profile {
-    const profile = new Profile();
-    profile.username = user.username;
-    profile.bio = user.bio;
-    profile.image = user.image;
-    profile.following = isFollowing;
-
-    return profile;
-  }
 }
